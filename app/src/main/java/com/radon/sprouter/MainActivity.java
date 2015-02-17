@@ -1,6 +1,8 @@
 package com.radon.sprouter;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.WindowManager;
@@ -18,6 +20,7 @@ import android.widget.SearchView;
 public class MainActivity extends FragmentActivity {
     TweetFragment frag;
     SearchView searchView;
+    AlertDialog alertDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +28,7 @@ public class MainActivity extends FragmentActivity {
         setContentView(R.layout.activity_main);
 
         frag = (TweetFragment) getFragmentManager().findFragmentById(R.id.tweet_frag);
-
+        alertDialog = new AlertDialog.Builder(this).create();
         //SearchView box that lets users search twitter by keywords
         searchView = (SearchView)findViewById(R.id.search);
 
@@ -52,4 +55,23 @@ public class MainActivity extends FragmentActivity {
 
     }
 
+    public void prompt(Tweet tweet){
+        // Display Author ID, Tweet ID, and Text in Dialog
+        alertDialog.setTitle("Reply:");
+        alertDialog.setMessage("Author ID: " + tweet.user_id + "\n\n" + "Tweet ID: " + tweet.tweet_id + "\n\n" + "Text: " + tweet.text);
+
+        alertDialog.setButton("Done", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                alertDialog.dismiss();
+            }
+        });
+
+        alertDialog.show();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        alertDialog.dismiss();
+    }
 }

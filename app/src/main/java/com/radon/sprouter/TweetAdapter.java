@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -35,14 +36,29 @@ public class TweetAdapter extends ArrayAdapter<Tweet> {
         this.context = context;
     }
 
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
         View view = convertView;
 
+        //Take advantage of the wonderful ViewHolder Design Pattern
+        ViewHolder holder = new ViewHolder();
+
         if(convertView == null){
             LayoutInflater layoutInflater = LayoutInflater.from(getContext());
             view = layoutInflater.inflate(R.layout.tweet_view, null);
+
+
+            holder.avatar = (ImageView) view.findViewById(R.id.avatar);
+            holder.author = (TextView) view.findViewById(R.id.author);
+            holder.timestamp = (TextView) view.findViewById(R.id.timestamp);
+            holder.text = (TextView) view.findViewById(R.id.tweet);
+            holder.photo = (ImageView) view.findViewById(R.id.photo);
+            holder.location = (TextView) view.findViewById(R.id.location);
+            view.setTag(holder);
+        }else{
+            holder = (ViewHolder) view.getTag();
         }
 
         //Get the Tweet at the current position in the list
@@ -55,61 +71,42 @@ public class TweetAdapter extends ArrayAdapter<Tweet> {
             @Override
             public void onClick(View v)
             {
-                // Display Author ID, Tweet ID, and Text in Dialog
-                AlertDialog alertDialog = new AlertDialog.Builder(context).create();
-                alertDialog.setTitle("Reply:");
-                alertDialog.setMessage("Author ID: " + tweet.user_id + "\n\n" + "Tweet ID: " + tweet.tweet_id + "\n\n" + "Text: " + tweet.text);
-
-                alertDialog.setButton("Done", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Do nothing
-                    }
-                });
-
-                alertDialog.show();
-
+                ((MainActivity)context).prompt(tweet);
             }
 
         });
 
 
         if(tweet != null) {
-            //Find all views to be populated
-            ImageView avatar = (ImageView) view.findViewById(R.id.avatar);
-            TextView author = (TextView) view.findViewById(R.id.author);
-            TextView timestamp = (TextView) view.findViewById(R.id.timestamp);
-            TextView text = (TextView) view.findViewById(R.id.tweet);
-            ImageView photo = (ImageView) view.findViewById(R.id.photo);
-            TextView location = (TextView) view.findViewById(R.id.location);
 
             //If the Bitmaps aren't saved in Tweet object, load them asynchronously
             //else, just set them from the Tweet object
             if (tweet.avatar_pic == null){
-                new LoadPictures(view, avatar, photo).execute(tweet);
+                new LoadPictures(view, holder.avatar, holder.photo).execute(tweet);
             }else{
-                avatar.setImageBitmap(tweet.avatar_pic);
-                photo.setImageBitmap(tweet.photo_pic);
+                holder.avatar.setImageBitmap(tweet.avatar_pic);
+                holder.photo.setImageBitmap(tweet.photo_pic);
             }
 
 
-            if(author != null){
+            if(holder.author != null){
                 //set author
-                author.setText(tweet.author);
+                holder.author.setText(tweet.author);
             }
 
-            if(timestamp != null){
+            if(holder.timestamp != null){
                 //set timestamp
-                timestamp.setText(tweet.timestamp);
+                holder.timestamp.setText(tweet.timestamp);
             }
 
-            if(text != null){
+            if(holder.text != null){
                 //set text
-                text.setText(tweet.text);
+                holder.text.setText(tweet.text);
             }
 
-            if(location != null){
+            if(holder.location != null){
                 //set location
-                location.setText(tweet.location);
+                holder.location.setText(tweet.location);
             }
         }
         return view;
@@ -187,4 +184,14 @@ public class TweetAdapter extends ArrayAdapter<Tweet> {
             //Do nothing
         }
     }
+
+    static class ViewHolder {
+        ImageView avatar;
+        TextView author;
+        TextView timestamp;
+        TextView text;
+        ImageView photo;
+        TextView location;
+    }
+
 }

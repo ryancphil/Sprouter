@@ -164,9 +164,7 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
         //if data gets too large, drop older tweets in order to prevent OutOfMemoryError
         if(this.data.size() > 45){
             //Remove first 15 tweets
-            for(int i = 0; i < 15; i++){
-                this.data.remove(0);
-            }
+            this.data.subList(0,14).clear();
         //If NO new tweets were retrieved, prevent firing the loader until a new keyword is searched
         }else if(data.size() == 0) {
             //Modify the listView footer to notify the user that there are no more new tweets
@@ -177,7 +175,7 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
             moreTweets = false;
         }
         //update the data array with newly fetched items
-        for(int i = 0; i < data.size();i++) {
+        for (int i = 0; i < data.size(); i++) {
             this.data.add(data.get(i));
         }
         adapter.notifyDataSetChanged();
