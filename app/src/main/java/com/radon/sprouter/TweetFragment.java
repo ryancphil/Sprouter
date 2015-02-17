@@ -109,9 +109,16 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
         if(savedInstanceState == null) {
             //Log.e("INIT LOADER: ", "ON CREATE");
             //Lock the orientaion of device when loader is executing to prevent losing an AsyncTask into the abyss.
-            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
             getLoaderManager().initLoader(0, null, TweetFragment.this).forceLoad();
         }else{
+            moreTweets = savedInstanceState.getBoolean("moreTweets");
+            if(!moreTweets){
+                //Modify the listView footer to notify the user that there are no more new tweets
+                TextView textView = (TextView) footer.findViewById(R.id.footer_text);
+                textView.setText("No more tweets.");
+                footer.findViewById(R.id.progressBar1).setVisibility(View.INVISIBLE);
+            }
             //Log.e("ROTATION: ", "SAVED STATE");
             //A loader exists so repopulate the listview from savedInstanceState
             data.clear();
@@ -198,6 +205,7 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
         super.onSaveInstanceState(outState);
         //Save state so orientation changes don't meddle with results
         outState.putParcelableArrayList("key", data);
+        outState.putBoolean("moreTweets", moreTweets);
     }
 
     //Method is called when the user searches keywords
@@ -224,7 +232,7 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 
         //Restart the loader and lock orientation
         //Log.e("LOAD1: ", "RELOAD DATA");
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
         getLoaderManager().restartLoader(0,null,TweetFragment.this).forceLoad();
     }
 
@@ -247,7 +255,7 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 
         //Restart the loader and lock orientation
         //Log.e("LOAD1: ", "MORE TWEETS");
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
         getLoaderManager().restartLoader(0,null,TweetFragment.this).forceLoad();
     }
 
