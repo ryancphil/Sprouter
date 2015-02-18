@@ -56,11 +56,31 @@ public class Tweet implements Parcelable{
         dest.writeString(author);
         dest.writeString(text);
         dest.writeString(location);
-        if(photo != null) {
-            dest.writeString(photo);
-        }
+        dest.writeString(photo);
         dest.writeString(timestamp);
         dest.writeString(tweet_id);
         dest.writeString(user_id);
+    }
+
+    public static final Parcelable.Creator<Tweet> CREATOR
+            = new Parcelable.Creator<Tweet>() {
+        public Tweet createFromParcel(Parcel in) {
+            return new Tweet(in);
+        }
+
+        public Tweet[] newArray(int size) {
+            return new Tweet[size];
+        }
+    };
+
+    private Tweet(Parcel in) {
+        avatar = in.readString();
+        author = in.readString();
+        text = in.readString();
+        location = in.readString();
+        photo = in.readString();
+        timestamp = in.readString();
+        tweet_id = in.readString();
+        user_id = in.readString();
     }
 }

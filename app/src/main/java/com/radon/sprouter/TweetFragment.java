@@ -1,22 +1,16 @@
 package com.radon.sprouter;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Loader;
 import android.content.pm.ActivityInfo;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.app.ListFragment;
 import android.app.LoaderManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -31,8 +25,6 @@ import java.util.ArrayList;
 public class TweetFragment extends ListFragment implements LoaderManager.LoaderCallbacks<ArrayList<Tweet>> {
 
     //Location variables to get the users GPS location
-    LocationManager lm;
-    Location location;
     String latitude;
     String longitude;
 
@@ -67,41 +59,7 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
         tweets = getListView();
         tweets.addFooterView(footer);
 
-        //Get the users Last known location for the default search
-        lm = (LocationManager)getActivity().getSystemService(Context.LOCATION_SERVICE);
-        location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if(location != null) {
-            longitude = Double.toString(location.getLongitude());
-            latitude = Double.toString(location.getLatitude());
-            url = "https://api.twitter.com/1.1/search/tweets.json?q=" + keyword + "&geocode=" + latitude + "," + longitude + ",5mi";
-        }
 
-        //LocationListener updates the users location when it detects a change
-        final LocationListener locationListener = new LocationListener() {
-            public void onLocationChanged(Location location) {
-                longitude = Double.toString(location.getLongitude());
-                latitude = Double.toString(location.getLatitude());
-                url = "https://api.twitter.com/1.1/search/tweets.json?q=" + keyword + "&geocode=" + latitude + "," + longitude + ",5mi";
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-                //Do nothing
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-                //Do nothing
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-                //Do nothing
-            }
-        };
-
-        //Request location updates every 10 seconds. Probably not good for device battery life, but nice for testing purposes.
-        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 10, locationListener);
 
         //Initialize adapter
         adapter = new TweetAdapter(getActivity(), android.R.layout.simple_list_item_1, data);
@@ -151,7 +109,6 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 
         });
 
-
     }
 
     @Override
@@ -168,12 +125,19 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
 
     @Override
     public void onLoadFinished(Loader<ArrayList<Tweet>> loader, ArrayList<Tweet> data) {
-        //if data gets too large, drop older tweets in order to prevent OutOfMemoryError
-        if(this.data.size() > 45){
-            //Remove first 15 tweets
-            this.data.subList(0,14).clear();
-        //If NO new tweets were retrieved, prevent firing the loader until a new keyword is searched
-        }else if(data.size() == 0) {
+        if(data != null && data.size() > 0){
+            //if data gets too large, drop older tweets in order to prevent OutOfMemoryError
+            if(this.data.size() > 45){
+                //Remove first 15 tweets
+                this.data.subList(0,14).clear();
+            }
+            //update the data array with newly fetched items
+            for (int i = 0; i < data.size(); i++) {
+                this.data.add(data.get(i));
+            }
+            adapter.notifyDataSetChanged();
+        }else{
+            //No data retrieved
             //Modify the listView footer to notify the user that there are no more new tweets
             TextView textView = (TextView) footer.findViewById(R.id.footer_text);
             textView.setText("No more tweets.");
@@ -181,11 +145,6 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
             //Set flag
             moreTweets = false;
         }
-        //update the data array with newly fetched items
-        for (int i = 0; i < data.size(); i++) {
-            this.data.add(data.get(i));
-        }
-        adapter.notifyDataSetChanged();
 
         //Unlock the screen orientation once the loader is finished
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);

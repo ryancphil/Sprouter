@@ -1,14 +1,9 @@
 package com.radon.sprouter;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -139,7 +134,7 @@ public class TweetAdapter extends ArrayAdapter<Tweet> {
                 results[0] = avatar_bit;
 
                 //There will not always be inline photos so check to see if tweet object actually has one first.
-                if(params[0].photo != null) {
+                if(!params[0].photo.equals("none")) {
                     URL photo_url = new URL(params[0].photo);
                     Bitmap photo_bit = BitmapFactory.decodeStream(photo_url.openConnection().getInputStream());
                     results[1] = photo_bit;
