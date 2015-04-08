@@ -35,8 +35,8 @@ import java.util.Date;
 public class TweetLoader extends AsyncTaskLoader<ArrayList<Tweet>> {
 
     //Twitter API variables
-    final static String CONSUMER_KEY = "<PUT_KEY_HERE>";
-    final static String CONSUMER_SECRET = "<PUT_SECRET_HERE>";
+    final static String CONSUMER_KEY = "PUT_KEY_HERE";
+    final static String CONSUMER_SECRET = "PUT_SECRET_HERE";
     final static String TwitterTokenURL = "https://api.twitter.com/oauth2/token";
     String TwitterStreamURL = "https://api.twitter.com/1.1/search/tweets.json?q=";
 
@@ -132,7 +132,8 @@ public class TweetLoader extends AsyncTaskLoader<ArrayList<Tweet>> {
 
     //PARSE method for the JSON object of tweets and convert the String to ArrayList<Tweet>
     public ArrayList<Tweet> parse(String data){
-        //Log.e("Parse: ", "entered.");
+        Log.e("TWEETS: ", data);
+
         String avatar;
         String author;
         String text;

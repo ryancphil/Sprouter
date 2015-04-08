@@ -7,6 +7,8 @@ import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -56,6 +58,8 @@ public class TweetAdapter extends ArrayAdapter<Tweet> {
             holder = (ViewHolder) view.getTag();
         }
 
+        holder.avatar.setImageResource(R.drawable.avatar_default);
+
         //Get the Tweet at the current position in the list
         final Tweet tweet = getItem(position);
 
@@ -70,7 +74,6 @@ public class TweetAdapter extends ArrayAdapter<Tweet> {
             }
 
         });
-
 
         if(tweet != null) {
 
@@ -104,6 +107,11 @@ public class TweetAdapter extends ArrayAdapter<Tweet> {
                 holder.location.setText(tweet.location);
             }
         }
+
+        //Add a listview animation to make scrolling look smoother.
+        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.abc_fade_in);
+        view.startAnimation(animation);
+
         return view;
     }
 

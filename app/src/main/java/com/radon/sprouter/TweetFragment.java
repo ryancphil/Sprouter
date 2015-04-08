@@ -66,8 +66,6 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
         //If no loader exists, initialize a new one
         if(savedInstanceState == null) {
             //Log.e("INIT LOADER: ", "ON CREATE");
-            //Lock the orientaion of device when loader is executing to prevent losing an AsyncTask into the abyss.
-            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
             getLoaderManager().initLoader(0, null, TweetFragment.this).forceLoad();
         }else{
             moreTweets = savedInstanceState.getBoolean("moreTweets");
@@ -120,12 +118,14 @@ public class TweetFragment extends ListFragment implements LoaderManager.LoaderC
     public Loader<ArrayList<Tweet>> onCreateLoader(int i, Bundle bundle) {
         //Create a new loader
         loader = new TweetLoader(this.getActivity(), url);
+        //Lock the orientaion of device when loader is executing to prevent losing an AsyncTask into the abyss.
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
         return loader;
     }
 
     @Override
     public void onLoadFinished(Loader<ArrayList<Tweet>> loader, ArrayList<Tweet> data) {
-        if(data != null && data.size() > 0){
+        if(data != null && data.size() > 1){
             //if data gets too large, drop older tweets in order to prevent OutOfMemoryError
             if(this.data.size() > 45){
                 //Remove first 15 tweets
